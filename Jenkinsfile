@@ -1,28 +1,49 @@
 pipeline {
   agent none
   stages {
-    stage('Test') {
-      agent {
-        kubernetes {
-          yamlFile 'nodejs-pod.yaml'
-        }
+    stage('Pull Request') {
+      when {
+        beforeAgent true
+        branch 'pr-*'
       }
-      steps {
-        container('nodejs') {
-          echo 'Hello World!'   
-          sh 'node --version'
+      stages {
+        stage('Build and Push Container Image') {
+          steps {
+            echo "TODO - Build and Push Container Image"
+          }
+        }
+        stage('Test') {
+          agent {
+            kubernetes {
+              yamlFile 'nodejs-pod.yaml'
+            }
+          }
+          steps {
+            container('nodejs') {
+              echo 'Hello World!'   
+              sh 'node --version'
+            }
+          }
         }
       }
     }
-    stage('Deploy') {
-        when {
-          beforeAgent true
-          branch 'main'
+    stage('Main Branch Stages') {
+      when {
+        beforeAgent true
+        branch 'main'
+      }
+      stages {
+        stage('Push Image to Prod Registry') {
+          steps {
+            echo "TODO - push image"
+          }
         }
-        steps {
-          echo "TODO - deploy"
+        stage('Deploy') {
+          steps {
+            echo "TODO - deploy"
+          }
         }
       }
-
+    }
   }
 }
